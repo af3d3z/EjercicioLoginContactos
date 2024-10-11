@@ -1,22 +1,16 @@
 package com.example.jetpackcomposecontactos
 
+import android.app.Activity
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.Paint.Style
-import android.graphics.drawable.Icon
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
@@ -39,8 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposecontactos.ui.theme.JetpackComposeContactosTheme
 
@@ -52,7 +44,6 @@ class MainActivity : ComponentActivity() {
             JetpackComposeContactosTheme {
                 Scaffold(content = { p ->
                     LoginPage(Modifier.padding(p))
-
                 })
             }
         }
@@ -114,7 +105,8 @@ fun LoginPage(modifier: Modifier){
 
 fun LoginOnClick (user: String, pass: String, ctx:Context){
     if (user.equals("alonso") && pass.equals("12345")){
-
+        var activity = ctx as Activity
+        activity.startActivity(Intent(ctx, ContactsActivity::class.java))
     }else {
         Toast.makeText(ctx, "Credenciales incorrectas.", Toast.LENGTH_SHORT).show()
     }
