@@ -1,11 +1,18 @@
 package com.example.jetpackcomposecontactos
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.drawable.shapes.Shape
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Space
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -22,21 +29,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -111,15 +125,16 @@ class ContactsActivity : AppCompatActivity() {
 
     @Composable
     fun Contactos(contacto: Contacto) {
+        val ctx = LocalContext.current
         var foto = R.drawable.ic_launcher_foreground
         var txtContacto = AnnotatedString(contacto.GetInitials())
         var showPhone by remember {
             mutableStateOf(false)
         }
         when (contacto.imagen){
-            0-> foto = R.drawable.male_icon
-            1-> foto = R.drawable.female_icon
-            2-> foto = R.drawable.nb_icon
+            0-> foto = R.drawable.cat_man
+            1-> foto = R.drawable.cat_woman
+            2-> foto = R.drawable.cat_nb
         }
         Card(
             modifier = Modifier
@@ -134,33 +149,49 @@ class ContactsActivity : AppCompatActivity() {
                         painter = painterResource(foto), // Load the image
                         contentDescription = null,
                         modifier = Modifier
-                            .height(100.dp)
-                            .width(100.dp)
+                            .fillMaxWidth()
+                            .padding(top = 20.dp)
                             .weight(1f)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable { showPhone = !showPhone }
+                            .size(115.dp)
+                            .clip(CircleShape)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ClickableText(
-                        modifier = Modifier.weight(2f),
-                        text = txtContacto,
-                        onClick = {
-                            showPhone = !showPhone
-                        }
-                    )
+                    Spacer(modifier = Modifier.height(10.dp).weight(1f))
+                    Text(modifier = Modifier.fillMaxWidth().weight(2f).align(Alignment.CenterHorizontally), text = txtContacto, textAlign = TextAlign.Center)
                 }
-                AnimatedVisibility(visible = showPhone) {
-                    Text(contacto.nombre, modifier = Modifier.fillMaxSize().padding(20.dp).padding(10.dp))
+                AnimatedVisibility(visible = showPhone ) {
                     ClickableText(
-                        text = AnnotatedString(contacto.tfno),
+                        text = AnnotatedString(contacto.nombre),
                         onClick = { showPhone = !showPhone },
                         style = androidx.compose.ui.text.TextStyle(
                             textAlign = TextAlign.Center
                         ),
-                        modifier = Modifier.fillMaxSize().padding(10.dp)
+                        modifier = Modifier.fillMaxSize().padding(bottom = 20.dp)
                     )
+                    TextButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 30.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
+                        onClick = { makeCall(contacto.tfno, ctx) }){
+                        Text(contacto.tfno)
+                    }
 
                 }
 
             }
+        }
+    }
+
+    private fun makeCall(phoneNumber: String, ctx: Context) {
+        val phoneUri = Uri.parse("tel:" + phoneNumber)
+        val intent = Intent(Intent.ACTION_DIAL, phoneUri)
+
+        try{
+            ctx.startActivity(intent)
+        }catch(s :SecurityException) {
+            Toast.makeText(ctx, "An error ocurred", Toast.LENGTH_SHORT).show()
         }
     }
 }
